@@ -51,21 +51,21 @@
 
     <div class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-xl p-6 md:p-8">
         <!-- Language Switcher -->
-        <div class="flex justify-center mb-6">
+        <div class="flex justify-center mb-4">
             <div class="flex border border-gray-300 rounded-lg p-1">
                 <button id="lang-en" class="lang-btn px-4 py-1 text-sm font-semibold rounded-md transition-colors">English</button>
                 <button id="lang-km" class="lang-btn px-4 py-1 text-sm font-semibold rounded-md transition-colors" style="font-family: 'Koulen';">ខ្មែរ</button>
             </div>
         </div>
 
-        <div class="text-center mb-8">
+        <div class="text-center mb-6">
             <h1 data-translate="title" class="text-2xl md:text-3xl font-bold text-gray-900">Frame Your Photo</h1>
             <p data-translate="subtitle_upload" id="subtitle" class="text-gray-500 mt-2">Upload a frame and a photo to begin.</p>
         </div>
 
         <!-- Upload Section -->
         <div id="upload-section">
-            <div class="mb-6">
+            <div class="mb-4">
                 <label for="frame-upload" class="file-input-button flex items-center justify-center w-full bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md">
                     <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                     <span data-translate="upload_frame">1. Upload Frame Image</span>
@@ -73,7 +73,7 @@
                 <input id="frame-upload" type="file" accept="image/png, image/jpeg">
                 <p id="frame-filename" class="text-center text-sm text-gray-500 mt-2 truncate"></p>
             </div>
-            <div class="mb-6">
+            <div class="mb-4">
                 <label for="photo-upload" class="file-input-button flex items-center justify-center w-full bg-sky-500 text-white font-semibold py-3 px-4 rounded-lg shadow-md">
                     <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                     <span data-translate="upload_photo">2. Upload Your Photo</span>
@@ -86,25 +86,30 @@
         <canvas id="composition-canvas" class="hidden"></canvas>
 
         <div id="result-section" class="hidden text-center">
-            <div id="live-preview-container" class="relative w-full max-w-xs mx-auto rounded-lg overflow-hidden shadow-inner mb-4">
+            <div id="live-preview-container" class="relative w-full max-w-xs mx-auto rounded-lg overflow-hidden shadow-inner mb-2">
                  <canvas id="live-canvas"></canvas>
                  <img id="frame-overlay" src="" alt="Frame overlay"/>
             </div>
-            <p data-translate="instructions" class="text-gray-500 text-sm mb-6 -mt-1">Drag to pan, pinch or scroll to zoom.</p>
+            <p data-translate="instructions" class="text-gray-500 text-sm mb-4">Drag to pan, pinch or scroll to zoom.</p>
 
-            <div id="action-buttons" class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div id="action-buttons" class="mt-4 flex flex-col gap-3">
+                <!-- Row 1: Change Button -->
                 <button id="back-btn" class="flex items-center justify-center w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z"></path></svg>
                     <span data-translate="button_change">Change</span>
                 </button>
-                <button id="download-btn" class="flex items-center justify-center w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                    <span data-translate="button_download">Download</span>
-                </button>
-                <button id="share-btn" class="flex items-center justify-center w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
-                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.368a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path></svg>
-                    <span data-translate="button_share">Share</span>
-                </button>
+                
+                <!-- Row 2: Download & Share Buttons -->
+                <div class="grid grid-cols-2 gap-3">
+                    <button id="download-btn" class="flex items-center justify-center w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        <span data-translate="button_download">Download</span>
+                    </button>
+                    <button id="share-btn" class="flex items-center justify-center w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
+                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.368a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path></svg>
+                        <span data-translate="button_share">Share</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -131,12 +136,12 @@
             subtitle_editor: "កែតម្រូវរូបថតរបស់អ្នក បន្ទាប់មករក្សាទុក!",
             upload_frame: "១. បញ្ចូលរូបភាពស៊ុម",
             upload_photo: "២. បញ្ចូលរូបថតរបស់អ្នក",
-            instructions: "អូសដើម្បីរំកិល​ ឬខ្ទាស់ដើម្បីពង្រីក",
+            instructions: "អូសដើម្បីរំកិល​ឬខ្ទាស់ដើម្បីពង្រីក",
             button_change: "ផ្លាស់ប្តូរ",
             button_download: "ទាញយក",
             button_share: "ចែករំលែក",
             share_error: "ការចែករំលែកមិនត្រូវបានគាំទ្រនៅលើកម្មវិធីរុករករបស់អ្នកទេ។ សូមទាញយករូបភាពហើយចែករំលែកវាដោយខ្លួនឯង។",
-            share_generic_error: "មានបញ្ហាខណៈពេលព្យាយាមចែករំលែក។ សូមព្យាយាមទាញយកแทน។"
+            share_generic_error: "មានបញ្ហាខណៈពេលព្យាយាមចែករំលែក។ សូមព្យាយាមទាញយកវិញ។"
         }
     };
     let currentLang = 'en';
@@ -174,7 +179,7 @@
     photoUpload.addEventListener('change', (e) => handleFileSelect(e, 'photo'));
     downloadBtn.addEventListener('click', downloadImage);
     shareBtn.addEventListener('click', shareImage);
-    backBtn.addEventListener('click', resetToUpload);
+    backBtn.addEventListener('click', returnToUploadScreen);
     livePreviewContainer.addEventListener('mousedown', startDrag);
     livePreviewContainer.addEventListener('touchstart', startDrag, { passive: false });
     livePreviewContainer.addEventListener('mousemove', drag);
@@ -194,27 +199,21 @@
             }
         });
         
-        // Update subtitle separately as its key changes
         if(resultSection.classList.contains('hidden')) {
             subtitle.textContent = translations[lang].subtitle_upload;
         } else {
             subtitle.textContent = translations[lang].subtitle_editor;
         }
 
-        // Update active button style
         langEnBtn.classList.toggle('active', lang === 'en');
         langKmBtn.classList.toggle('active', lang === 'km');
     }
 
     // --- Core Functions ---
-    function resetToUpload() {
-        frameImage = null; userImage = null;
-        frameUpload.value = ''; photoUpload.value = '';
-        frameFilename.textContent = ''; photoFilename.textContent = '';
+    function returnToUploadScreen() {
         uploadSection.classList.remove('hidden');
         resultSection.classList.add('hidden');
         subtitle.textContent = translations[currentLang].subtitle_upload;
-        resetAdjustments();
     }
 
     function handleFileSelect(e, type) {
@@ -224,13 +223,18 @@
         reader.onload = (event) => {
             const img = new Image();
             img.onload = () => {
-                if (type === 'frame') frameImage = img;
-                else userImage = img;
+                if (type === 'frame') {
+                    frameImage = img;
+                } else {
+                    userImage = img;
+                }
                 
                 const filenameEl = type === 'frame' ? frameFilename : photoFilename;
                 filenameEl.textContent = file.name;
 
-                if (frameImage && userImage) switchToEditorView();
+                if (frameImage && userImage) {
+                    switchToEditorView();
+                }
             };
             img.src = event.target.result;
         };
