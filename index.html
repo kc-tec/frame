@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Absent Request Form</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- html2canvas CDN for converting HTML to image -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Google Fonts - Koh Santepheap and Moul -->
+    <link href="https://fonts.googleapis.com/css2?family=Koh+Santepheap:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Moul&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Custom styles for Koh Santepheap font and rounded corners */
+        body {
+            font-family: 'Koh Santepheap', sans-serif; /* Applied Koh Santepheap font to the entire body */
+            background-color: #f0f2f5; /* Light gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Full viewport height */
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container-wrapper {
+            width: 100%;
+            max-width: 600px; /* Max width for both form and slip */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .form-container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 16px; /* Rounded corners for the container */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Soft shadow */
+            text-align: left; /* Align text to left for form labels */
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px; /* Space between sections */
+            overflow-x: auto; /* Allow horizontal scrolling if content overflows */
+        }
+        .hidden {
+            display: none !important;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #374151;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group input[type="date"],
+        .form-group select { /* Added select for styling */
+            border: 1px solid #d1d5db; /* Light gray border */
+            padding: 10px 14px;
+            border-radius: 8px; /* Rounded corners for input */
+            width: 100%;
+            font-size: 1rem;
+            color: #374151; /* Darker text */
+            box-sizing: border-box; /* Include padding in width */
+            background-color: white; /* Ensure select background is white */
+            -webkit-appearance: none; /* Remove default iOS styling */
+            appearance: none; /* Remove default styling */
+        }
+        /* Specific styling for date input to ensure consistent appearance */
+        .form-group input[type="date"]::-webkit-calendar-picker-indicator {
+            opacity: 1;
+            display: block;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>') no-repeat center center;
+            background-size: contain;
+            width: 1.2em; /* Adjust size as needed */
+            height: 1.2em; /* Adjust size as needed */
+            cursor: pointer;
+            margin-left: auto; /* Push to the right */
+        }
+        .form-group input[type="radio"] {
+            margin-right: 8px;
+        }
+        .form-group .radio-group label {
+            display: inline-block;
+            margin-right: 16px;
+            font-weight: normal; /* Override form-group label weight */
+        }
+        /* New custom button style */
+        .custom-button {
+            background-color: #4f46e5; /* Indigo */
+            color: white;
+            padding: 12px 24px; /* Adjusted padding */
+            border: none;
+            border-radius: 8px; /* Rounded corners for button */
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            width: auto; /* Allow button to size naturally */
+            align-self: flex-start; /* Align button to the left */
+            display: flex; /* Enable flexbox for icon and text alignment */
+            align-items: center; /* Vertically align icon and text */
+            justify-content: center; /* Center content horizontally */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Stronger shadow */
+        }
+        .custom-button:hover {
+            background-color: #4338ca; /* Darker indigo on hover */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25); /* Even stronger shadow on hover */
+        }
+        .custom-button i {
+            margin-right: 8px; /* Space between icon and text */
+        }
+        h1 {
+            color: #1f2937;
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 24px;
+            text-align: center; /* Center the main title */
+        }
+        .bg-gray-100 {
+            background-color: #f3f4f6; /* Lighter gray for read-only fields */
+        }
+
+        /* Styles for the Absence Slip Preview */
+        .slip-preview-container {
+            background-color: #ffffff;
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15); /* Stronger shadow for slip */
+            width: 600px; /* Fixed width for the slip container */
+            height: 750px; /* Changed height to 750px */
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .slip-preview-content {
+            line-height: 1.6;
+            color: #1f2937;
+            font-family: 'Koh Santepheap', sans-serif; /* Apply Koh Santepheap font */
+            padding: 24px; /* Added padding for paper-like margin */
+            border: 1px solid #e0e0e0; /* Subtle border to define the "paper" */
+            border-radius: 8px; /* Match container border-radius */
+            flex-grow: 1; /* Allow content to grow and take available space */
+            overflow: auto; /* Add scroll if content overflows */
+            background-image: url('bk.PNG'); /* Background image */
+            background-size: cover; /* Cover the entire area */
+            background-repeat: no-repeat; /* Do not repeat the image */
+            background-position: center; /* Center the background image */
+        }
+        .slip-header {
+            text-align: center;
+            margin-bottom: 14px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 14px;
+        }
+        .slip-header h2 {
+            font-family: 'Moul', cursive; /* Apply Moul font to the header title */
+            font-size: 1.6rem; /* Increased font size */
+            font-weight: normal; /* Removed bold */
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+        .slip-header p {
+            font-size: 1.2rem; /* Increased font size */
+            color: #4b5563;
+        }
+        .slip-detail-section {
+            margin-bottom: 14px; /* Updated margin-bottom */
+        }
+        .slip-detail-section p {
+            text-align: left; /* Default to left align for paragraphs in this section */
+            font-size: 1.2rem; /* Increased font size */
+        }
+        .slip-subtitle-section { /* New class for the subtitle section */
+            text-align: center; /* Center align for this specific section */
+            margin-bottom: 14px; /* Add some space below */
+        }
+        .slip-subtitle-section p { /* Apply font size to paragraphs within this section */
+            font-size: 1.2rem; /* Increased font size */
+        }
+        .slip-detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0; /* Increased padding */
+            border-bottom: 1px solid #e5e7eb; /* Solid line for clarity */
+            font-size: 1.15rem; /* Increased font size */
+        }
+        .slip-detail-item:last-child {
+            border-bottom: none;
+        }
+        .slip-detail-label {
+            font-weight: 600;
+            flex: 1;
+            padding-right: 15px;
+            color: #374151;
+        }
+        .slip-detail-value {
+            flex: 2;
+            text-align: right;
+            color: #1f2937;
+            word-break: break-all; /* Ensure long IDs wrap */
+        }
+        .signature-block {
+            text-align: right; /* Align the entire signature block to right */
+            margin-top: 2px; /* Updated margin-top */
+        }
+        .signature-block p {
+            margin-bottom: 2px; /* Updated margin-bottom */
+            font-size: 1.2rem; /* Increased font size */
+        }
+        .signature-block strong {
+            display: block; /* Ensure officer name is on its own line */
+            margin-top: 2px; /* Updated margin-top */
+            font-size: 1.2rem; /* Increased font size */
+        }
+        .signature-image {
+            max-width: 200px; /* Decreased max-width */
+            height: 80px; /* Increased height to 80px */
+            object-fit: contain; /* Ensure image scales properly without distortion */
+            display: block;
+            margin-left: auto; /* Push to the right */
+            margin-right: 0; /* No right margin */
+            margin-top: 5px; /* Updated margin-top */
+        }
+        .slip-actions {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px; /* Increased space between buttons */
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-wrapper">
+        <div id="formContainer" class="form-container">
+            <h1>សំណើរសុំច្បាប់ឈប់សម្រាក</h1> <!-- Absent Request Form -->
+
+            <form id="absentForm">
+                <!-- Absent ID -->
+                <div class="form-group">
+                    <label for="absentId">លេខសម្គាល់អវត្តមាន:</label>
+                    <input type="text" id="absentId" name="absentId" readonly class="bg-gray-100 cursor-not-allowed">
+                </div>
+
+                <!-- Student ID and Student Name in one row -->
+                <div class="flex flex-row flex-nowrap -mx-2">
+                    <div class="form-group w-1/4 px-2 flex-shrink-0">
+                        <label for="studentId">អត្តលេខ:</label>
+                        <input type="number" id="studentId" name="studentId" placeholder="បញ្ចូលអត្តលេខ" required>
+                    </div>
+                    <div class="form-group w-3/4 px-2 flex-shrink-0">
+                        <label for="studentName">ឈ្មោះសិស្ស:</label>
+                        <input type="text" id="studentName" name="studentName" placeholder="បញ្ចូលឈ្មោះសិស្ស" required>
+                    </div>
+                </div>
+
+                <!-- Sex -->
+                <div class="form-group">
+                    <label>ភេទ:</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="sex" value="male" required checked> ប្រុស</label>
+                        <label><input type="radio" name="sex" value="female"> ស្រី</label>
+                    </div>
+                </div>
+
+                <!-- Class, Year, Generation in one row -->
+                <div class="flex flex-row flex-nowrap -mx-2">
+                    <div class="form-group flex-1 px-2 flex-shrink-0">
+                        <label for="studentClass">ថ្នាក់:</label>
+                        <select id="studentClass" name="studentClass" required>
+                            <option value="ក" selected>ក</option>
+                            <option value="ខ">ខ</option>
+                            <option value="គ">គ</option>
+                            <option value="ឃ">ឃ</option>
+                            <option value="ង">ង</option>
+                            <option value="ច">ច</option>
+                            <option value="ឆ">ឆ</option>
+                            <option value="ជ">ជ</option>
+                            <option value="ឈ">ឈ</option>
+                            <option value="ញ">ញ</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group flex-1 px-2 flex-shrink-0">
+                        <label for="studentYear">ឆ្នាំ:</label>
+                        <select id="studentYear" name="studentYear" required>
+                            <option value="១">១</option>
+                            <option value="២" selected>២</option>
+                            <option value="៣">៣</option>
+                            <option value="៤">៤</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group flex-1 px-2 flex-shrink-0">
+                        <label for="generation">ជំនាន់:</label>
+                        <select id="generation" name="generation">
+                            <option value="៤០" selected>៤០</option>
+                            <option value="៤១">៤១</option>
+                            <option value="៤២">៤២</option>
+                            <option value="៤៣">៤៣</option>
+                            <option value="៤៤">៤៤</option>
+                            <option value="៤៥">៤៥</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Absent Days -->
+                <div class="form-group">
+                    <label for="absentDays">ចំនួនថ្ងៃអវត្តមាន:</label>
+                    <select id="absentDays" name="absentDays" required>
+                        <option value="1" selected>1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                    </select>
+                </div>
+
+                <!-- From Date -->
+                <div class="flex flex-row flex-nowrap -mx-2">
+                    <div class="form-group flex-1 px-2 flex-shrink-0">
+                        <label for="fromDate">ពីថ្ងៃ:</label>
+                        <input type="date" id="fromDate" name="fromDate" required>
+                    </div>
+
+                    <div class="form-group flex-1 px-2 flex-shrink-0">
+                        <label for="toDate">ដល់ថ្ងៃ:</label>
+                        <input type="date" id="toDate" name="toDate" required>
+                    </div>
+                </div>
+
+                <!-- Current Day -->
+                <div class="form-group hidden"> <!-- Hidden Current Day field -->
+                    <label for="currentDay">ថ្ងៃបច្ចុប្បន្ន:</label>
+                    <input type="text" id="currentDay" name="currentDay" readonly class="bg-gray-100 cursor-not-allowed">
+                </div>
+
+                <!-- Approver -->
+                <div class="form-group">
+                    <label for="approver">អ្នកអនុម័ត:</label>
+                    <select id="approver" name="approver" required>
+                        <option value="">ជ្រើសរើសអ្នកអនុម័ត</option> <!-- Select Approver -->
+                        <option value="នាយករង">នាយករង</option>
+                        <option value="ប្រធានផ្នែកសិក្សា" selected>ប្រធានផ្នែកសិក្សា</option>
+                        <option value="អនុប្រធានផ្នែកសិក្សា">អនុប្រធានផ្នែកសិក្សា</option>
+                        <option value="មន្ត្រីផ្នែកសិក្សា">មន្ត្រីផ្នែកសិក្សា</option>
+                    </select>
+                </div>
+
+                <!-- Officer Name -->
+                <div class="form-group hidden"> <!-- Hidden Officer Name field -->
+                    <label for="officerName">ឈ្មោះមន្ត្រី:</label>
+                    <input type="text" id="officerName" name="officerName" readonly class="bg-gray-100 cursor-not-allowed">
+                </div>
+
+                <button type="button" onclick="generateAbsenceSlip()" class="custom-button">
+                    <i class="fas fa-eye"></i> មើលជាមុន
+                </button>
+            </form>
+        </div>
+
+        <div id="slipPreviewContainer" class="slip-preview-container hidden">
+            <div id="slipContent" class="slip-preview-content">
+                <!-- Absence slip content will be generated here -->
+            </div>
+            <div class="slip-actions">
+                <button type="button" onclick="hideAbsenceSlip()" class="custom-button">
+                    <i class="fas fa-arrow-left"></i> ត្រឡប់ទៅទម្រង់
+                </button>
+                <button type="button" onclick="downloadAbsenceSlip()" class="custom-button">
+                    <i class="fas fa-download"></i> ទាញយក
+                </button>
+                <button type="button" onclick="shareAbsenceSlip()" class="custom-button">
+                    <i class="fas fa-share-alt"></i> ចែករំលែក
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript logic for date conversion and form initialization
+
+        // Khmer numbers mapping (0-9)
+        const khmerNumbers = ['០', '១', '២', '៣', '៤', '៥', '៦', '៧', '៨', '៩'];
+
+        // Khmer month names
+        const khmerMonths = [
+            'មករា', 'កុម្ភៈ', 'មីនា', 'មេសា', 'ឧសភា', 'មិថុនា',
+            'កក្កដា', 'សីហា', 'កញ្ញា', 'តុលា', 'វិច្ឆិកា', 'ធ្នូ'
+        ];
+
+        // Mapping for Approver to Officer Name
+        const approverOfficerMap = {
+            'នាយករង': 'ព្រហ្ម មុន្នី',
+            'ប្រធានផ្នែកសិក្សា': 'សេង សត្យា',
+            'អនុប្រធានផ្នែកសិក្សា': 'ហ៊ង សុខលាភ',
+            'មន្ត្រីផ្នែកសិក្សា': 'កាក់ រតនា'
+        };
+
+        // Mapping for Approver to Signature Image filename (using .PNG)
+        const approverSignatureMap = {
+            'នាយករង': '001.PNG',
+            'ប្រធានផ្នែកសិក្សា': '002.PNG',
+            'អនុប្រធានផ្នែកសិក្សា': '003.PNG',
+            'មន្ត្រីផ្នែកសិក្សា': '004.PNG'
+        };
+
+        /**
+         * Converts a Western number to its Khmer numeral representation.
+         * @param {string|number} num - The Western number to convert.
+         * @returns {string} The number represented in Khmer numerals.
+         */
+        function convertNumberToKhmer(num) {
+            // Ensure num is treated as a string for iteration
+            return String(num).split('').map(digit => {
+                const parsedDigit = parseInt(digit);
+                return isNaN(parsedDigit) ? digit : khmerNumbers[parsedDigit];
+            }).join('');
+        }
+
+        /**
+         * Converts a Date object to a formatted Khmer date string.
+         * @param {Date} dateObj - The Date object to convert.
+         * @returns {string} The formatted Khmer date string.
+         */
+        function getKhmerDateString(dateObj) {
+            const day = dateObj.getDate();
+            const month = dateObj.getMonth();
+            const year = dateObj.getFullYear();
+            const khmerDay = convertNumberToKhmer(day);
+            const khmerYear = convertNumberToKhmer(year);
+            const khmerMonthName = khmerMonths[month];
+            return `ថ្ងៃទី ${khmerDay} ខែ ${khmerMonthName} ឆ្នាំ ${khmerYear}`;
+        }
+
+        /**
+         * Generates and displays the Absence Slip in the slip preview container.
+         */
+        async function generateAbsenceSlip() {
+            const formContainer = document.getElementById('formContainer');
+            const slipPreviewContainer = document.getElementById('slipPreviewContainer');
+            const slipContentDiv = document.getElementById('slipContent');
+            const form = document.getElementById('absentForm');
+
+            // Basic form validation
+            if (!form.checkValidity()) {
+                form.reportValidity(); // Show browser's validation messages
+                return;
+            }
+
+            const absentId = document.getElementById('absentId').value;
+            const studentId = document.getElementById('studentId').value; // Get Student ID
+            const studentName = document.getElementById('studentName').value;
+            const sex = document.querySelector('input[name="sex"]:checked').value === 'male' ? 'ប្រុស' : 'ស្រី';
+            const studentClass = document.getElementById('studentClass').value;
+            const studentYear = document.getElementById('studentYear').value; // Get the Year value
+            const generation = document.getElementById('generation').value;
+            const absentDays = document.getElementById('absentDays').value;
+            const fromDate = document.getElementById('fromDate').value;
+            const toDate = document.getElementById('toDate').value;
+            const currentDay = getKhmerDateString(new Date()); // Get current day in Khmer
+            const approver = document.getElementById('approver').value;
+            const officerName = approverOfficerMap[approver] || ''; // Get officer name based on approver
+
+            // Get signature image path based on approver
+            const signatureImagePath = approverSignatureMap[approver] || ''; // Default to empty if no match
+
+            // Convert Western dates to Khmer for the slip
+            const fromDateObj = new Date(fromDate);
+            const toDateObj = new Date(toDate);
+
+            const khmerFromDate = getKhmerDateString(fromDateObj);
+            const khmerToDate = getKhmerDateString(toDateObj);
+            const khmerAbsentDays = convertNumberToKhmer(parseInt(absentDays)); // Convert absent days to Khmer number
+            const khmerAbsentId = convertNumberToKhmer(absentId); // Convert Absent ID string to Khmer number string
+
+            // Combine Class and Year for display in the preview
+            const combinedClassYear = `${studentClass}${studentYear}`;
+
+            // Construct the HTML content for the absence slip
+            const slipHtml = `
+                <div class="slip-header">
+                    <h2>បណ្ណអនុញ្ញាតច្បាប់</h2>
+                </div>
+                <div class="slip-detail-section">
+                    <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;យោងតាមពាក្យសុំច្បាប់លេខ ${khmerAbsentId} និងមូលហេតុសមស្របរបស់សាមីជន</p>
+                </div>
+                <div class="slip-subtitle-section">
+                    <p>ផ្នែកសិក្សាបានឃើញ និងអនុញ្ញាត</p>
+                </div>
+                <div class="slip-detail-section">
+                    <p class="text-left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ឱ្យគរុសិស្សឈ្មោះ <strong>${studentName}</strong> ភេទ <strong>${sex}</strong> ថ្នាក់ <strong>${combinedClassYear}</strong> ជំនាន់ទី <strong>${generation}</strong> ឆ្នាំសិក្សា ២០២៤-២០២៥ ឈប់សម្រាកចំនួន <strong>${khmerAbsentDays} ថ្ងៃ</strong> គិតចាប់ពី <strong>${khmerFromDate}</strong> ដល់ <strong>${khmerToDate}</strong> ។</p>
+                </div>
+                <div class="signature-block">
+                    <p>កំពង់ចាម ${currentDay}</p>
+                    <p>${approver}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+                    ${signatureImagePath ? `<img src="${signatureImagePath}" alt="Signature" class="signature-image" onerror="this.onerror=null;this.src='https://placehold.co/250x100/cccccc/333333?text=Signature+Missing';">` : ''}
+                    <p><strong>${officerName}</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+                </div>
+            `;
+
+            // Populate the slip content and show the slip, hide the form
+            slipContentDiv.innerHTML = slipHtml;
+            formContainer.classList.add('hidden');
+            slipPreviewContainer.classList.remove('hidden');
+        }
+
+        /**
+         * Hides the Absence Slip and shows the form container.
+         */
+        function hideAbsenceSlip() {
+            document.getElementById('formContainer').classList.remove('hidden');
+            document.getElementById('slipPreviewContainer').classList.add('hidden');
+        }
+
+        /**
+         * Downloads the Absence Slip as a PNG image.
+         */
+        async function downloadAbsenceSlip() {
+            const slipContentDiv = document.getElementById('slipContent');
+            try {
+                const canvas = await html2canvas(slipContentDiv, { scale: 2 }); // Scale for better quality
+                const image = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.href = image;
+                link.download = 'Absence_Slip.png';
+                document.body.appendChild(link); // Append to body to make it clickable
+                link.click(); // Programmatically click the link to trigger download
+                document.body.removeChild(link); // Clean up the temporary link
+            } catch (error) {
+                console.error('Error generating or downloading slip:', error);
+                // Replace with a custom modal in a real app
+                alert('Failed to download the slip. Please try again.');
+            }
+        }
+
+        /**
+         * Shares the Absence Slip as a PNG image using Web Share API.
+         */
+        async function shareAbsenceSlip() {
+            const slipContentDiv = document.getElementById('slipContent');
+
+            if (navigator.share) {
+                try {
+                    const canvas = await html2canvas(slipContentDiv, { scale: 2 }); // Scale for better quality
+                    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+                    const file = new File([blob], 'Absence_Slip.png', { type: 'image/png' });
+
+                    await navigator.share({
+                        files: [file],
+                        title: '',
+                        text: '',
+                    });
+                    console.log('Absence Slip shared successfully.');
+                } catch (error) {
+                    console.error('Error sharing Absence Slip:', error);
+                    // Replace with a custom modal in a real app
+                    if (error.name !== 'AbortError') { // User cancelled share
+                        alert('Failed to share the slip. Your device might not support sharing this content, or an error occurred.');
+                    }
+                }
+            } else {
+                // Fallback for browsers that do not support Web Share API
+                // Replace with a custom modal in a real app
+                alert('Web Share API is not supported in this browser. You can use the "Download" button instead.');
+            }
+        }
+
+        /**
+         * Initializes the form fields on page load.
+         * Populates Absent ID and Current Day.
+         */
+        document.addEventListener('DOMContentLoaded', () => {
+            // Get current date and time
+            const now = new Date();
+
+            // Format Absent ID (YYMMDDHHMMSS - 12 digits)
+            const yearTwoDigits = now.getFullYear().toString().slice(-2);
+            const monthPadded = (now.getMonth() + 1).toString().padStart(2, '0');
+            const dayPadded = now.getDate().toString().padStart(2, '0');
+            const hoursPadded = now.getHours().toString().padStart(2, '0');
+            const minutesPadded = now.getMinutes().toString().padStart(2, '0');
+            const secondsPadded = now.getSeconds().toString().padStart(2, '0');
+            const absentId = `${yearTwoDigits}${monthPadded}${dayPadded}${hoursPadded}${minutesPadded}${secondsPadded}`;
+            document.getElementById('absentId').value = absentId;
+
+            // Format Current Day in Khmer
+            // This field is hidden in the form, but its value is used in the slip preview
+            document.getElementById('currentDay').value = getKhmerDateString(now);
+
+            // Set From Date and To Date to today's date
+            const todayFormatted = now.toISOString().split('T')[0]; //YYYY-MM-DD
+            document.getElementById('fromDate').value = todayFormatted;
+            document.getElementById('toDate').value = todayFormatted;
+
+            // Event listener for Approver dropdown to update Officer Name
+            const approverSelect = document.getElementById('approver');
+            const officerNameInput = document.getElementById('officerName');
+
+            approverSelect.addEventListener('change', () => {
+                const selectedApprover = approverSelect.value;
+                officerNameInput.value = approverOfficerMap[selectedApprover] || ''; // Set officer name or empty string if not found
+            });
+
+            // Trigger change event on load to set initial officer name based on default approver
+            approverSelect.dispatchEvent(new Event('change'));
+        });
+    </script>
+</body>
+</html>
