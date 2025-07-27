@@ -8,7 +8,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Koulen&family=Noto+Sans+Khmer:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        body {
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Prevent scrolling */
             font-family: 'Inter', 'Noto Sans Khmer', sans-serif;
             overscroll-behavior-y: contain;
         }
@@ -31,6 +36,7 @@
             touch-action: none;
             cursor: grab;
             background-color: #e5e7eb; /* gray-200 */
+            aspect-ratio: 1 / 1; /* Make it square */
         }
         #live-preview-container:active {
             cursor: grabbing;
@@ -47,59 +53,63 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800 flex items-center justify-center min-h-screen p-4">
+<body class="bg-white">
 
-    <div class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-xl p-6 md:p-8">
-        <!-- Language Switcher -->
-        <div class="flex justify-center mb-4">
-            <div class="flex border border-gray-300 rounded-lg p-1">
-                <button id="lang-en" class="lang-btn px-4 py-1 text-sm font-semibold rounded-md transition-colors">English</button>
-                <button id="lang-km" class="lang-btn px-4 py-1 text-sm font-semibold rounded-md transition-colors" style="font-family: 'Koulen';">ខ្មែរ</button>
+    <div class="w-full h-full flex flex-col px-4 py-6">
+        <!-- Top Section -->
+        <div>
+            <!-- Language Switcher -->
+            <div class="flex justify-center mb-4">
+                <div class="flex border border-gray-300 rounded-lg p-1">
+                    <button id="lang-en" class="lang-btn px-4 py-1 text-sm font-semibold rounded-md transition-colors">English</button>
+                    <button id="lang-km" class="lang-btn px-4 py-1 text-sm font-semibold rounded-md transition-colors" style="font-family: 'Koulen';">ខ្មែរ</button>
+                </div>
+            </div>
+
+            <div class="text-center mb-4">
+                <h1 data-translate="title" class="text-2xl md:text-3xl font-bold text-gray-900">Frame Your Photo</h1>
+                <p data-translate="subtitle_upload" id="subtitle" class="text-gray-500 mt-1">Upload a frame and a photo to begin.</p>
             </div>
         </div>
 
-        <div class="text-center mb-6">
-            <h1 data-translate="title" class="text-2xl md:text-3xl font-bold text-gray-900">Frame Your Photo</h1>
-            <p data-translate="subtitle_upload" id="subtitle" class="text-gray-500 mt-2">Upload a frame and a photo to begin.</p>
+        <!-- Main Content -->
+        <div class="flex-grow flex flex-col justify-center min-h-0">
+            <!-- Upload Section -->
+            <div id="upload-section">
+                <div class="mb-4">
+                    <label for="frame-upload" class="file-input-button flex items-center justify-center w-full bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md">
+                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <span data-translate="upload_frame">1. Upload Frame Image</span>
+                    </label>
+                    <input id="frame-upload" type="file" accept="image/png, image/jpeg">
+                    <p id="frame-filename" class="text-center text-sm text-gray-500 mt-2 truncate"></p>
+                </div>
+                <div class="mb-4">
+                    <label for="photo-upload" class="file-input-button flex items-center justify-center w-full bg-sky-500 text-white font-semibold py-3 px-4 rounded-lg shadow-md">
+                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        <span data-translate="upload_photo">2. Upload Your Photo</span>
+                    </label>
+                    <input id="photo-upload" type="file" accept="image/png, image/jpeg">
+                    <p id="photo-filename" class="text-center text-sm text-gray-500 mt-2 truncate"></p>
+                </div>
+            </div>
+
+            <div id="result-section" class="hidden h-full flex flex-col">
+                <div id="live-preview-container" class="relative w-full max-w-xs mx-auto rounded-lg overflow-hidden">
+                     <canvas id="live-canvas"></canvas>
+                     <img id="frame-overlay" src="" alt="Frame overlay"/>
+                </div>
+                <p data-translate="instructions" class="text-gray-500 text-sm mt-2 mb-2 text-center">Drag to pan, pinch or scroll to zoom.</p>
+            </div>
         </div>
 
-        <!-- Upload Section -->
-        <div id="upload-section">
-            <div class="mb-4">
-                <label for="frame-upload" class="file-input-button flex items-center justify-center w-full bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md">
-                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                    <span data-translate="upload_frame">1. Upload Frame Image</span>
-                </label>
-                <input id="frame-upload" type="file" accept="image/png, image/jpeg">
-                <p id="frame-filename" class="text-center text-sm text-gray-500 mt-2 truncate"></p>
-            </div>
-            <div class="mb-4">
-                <label for="photo-upload" class="file-input-button flex items-center justify-center w-full bg-sky-500 text-white font-semibold py-3 px-4 rounded-lg shadow-md">
-                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                    <span data-translate="upload_photo">2. Upload Your Photo</span>
-                </label>
-                <input id="photo-upload" type="file" accept="image/png, image/jpeg">
-                <p id="photo-filename" class="text-center text-sm text-gray-500 mt-2 truncate"></p>
-            </div>
-        </div>
-
-        <canvas id="composition-canvas" class="hidden"></canvas>
-
-        <div id="result-section" class="hidden text-center">
-            <div id="live-preview-container" class="relative w-full max-w-xs mx-auto rounded-lg overflow-hidden shadow-inner mb-2">
-                 <canvas id="live-canvas"></canvas>
-                 <img id="frame-overlay" src="" alt="Frame overlay"/>
-            </div>
-            <p data-translate="instructions" class="text-gray-500 text-sm mb-4">Drag to pan, pinch or scroll to zoom.</p>
-
-            <div id="action-buttons" class="mt-4 flex flex-col gap-3">
-                <!-- Row 1: Change Button -->
+        <!-- Bottom Actions -->
+        <div id="action-buttons-container" class="hidden pt-2">
+             <div class="flex flex-col gap-3">
                 <button id="back-btn" class="flex items-center justify-center w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z"></path></svg>
                     <span data-translate="button_change">Change</span>
                 </button>
-                
-                <!-- Row 2: Download & Share Buttons -->
                 <div class="grid grid-cols-2 gap-3">
                     <button id="download-btn" class="flex items-center justify-center w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
@@ -112,6 +122,8 @@
                 </div>
             </div>
         </div>
+
+        <canvas id="composition-canvas" class="hidden"></canvas>
     </div>
 
 <script>
@@ -151,6 +163,7 @@
     const langKmBtn = document.getElementById('lang-km');
     const uploadSection = document.getElementById('upload-section');
     const resultSection = document.getElementById('result-section');
+    const actionButtonsContainer = document.getElementById('action-buttons-container');
     const subtitle = document.getElementById('subtitle');
     const frameUpload = document.getElementById('frame-upload');
     const photoUpload = document.getElementById('photo-upload');
@@ -213,6 +226,7 @@
     function returnToUploadScreen() {
         uploadSection.classList.remove('hidden');
         resultSection.classList.add('hidden');
+        actionButtonsContainer.classList.add('hidden');
         subtitle.textContent = translations[currentLang].subtitle_upload;
     }
 
@@ -244,9 +258,10 @@
     function switchToEditorView() {
         uploadSection.classList.add('hidden');
         resultSection.classList.remove('hidden');
+        actionButtonsContainer.classList.remove('hidden');
         subtitle.textContent = translations[currentLang].subtitle_editor;
         frameOverlay.src = frameImage.src;
-        livePreviewContainer.style.aspectRatio = frameImage.width / frameImage.height;
+        
         liveCanvas.width = frameImage.width;
         liveCanvas.height = frameImage.height;
         resetAdjustments();
@@ -323,25 +338,36 @@
 
     // --- Final Image Generation and Actions ---
     function generateFinalImage() {
-        compositionCanvas.width = frameImage.width;
-        compositionCanvas.height = frameImage.height;
+        const size = Math.max(frameImage.width, frameImage.height);
+        compositionCanvas.width = size;
+        compositionCanvas.height = size;
+        
         const ctx = compositionCtx;
+        ctx.clearRect(0,0,size,size);
+
         const photoAspectRatio = userImage.width / userImage.height;
-        const canvasAspectRatio = ctx.canvas.width / ctx.canvas.height;
         let drawWidth, drawHeight;
-        if (photoAspectRatio > canvasAspectRatio) {
-            drawHeight = ctx.canvas.height;
+
+        if (photoAspectRatio > 1) {
+            drawHeight = size;
             drawWidth = drawHeight * photoAspectRatio;
         } else {
-            drawWidth = ctx.canvas.width;
+            drawWidth = size;
             drawHeight = drawWidth / photoAspectRatio;
         }
+        
         drawWidth *= photoSettings.scale;
         drawHeight *= photoSettings.scale;
-        const x = (ctx.canvas.width - drawWidth) / 2 + photoSettings.offsetX;
-        const y = (ctx.canvas.height - drawHeight) / 2 + photoSettings.offsetY;
+        
+        const x = (size - drawWidth) / 2 + photoSettings.offsetX;
+        const y = (size - drawHeight) / 2 + photoSettings.offsetY;
+
         ctx.drawImage(userImage, x, y, drawWidth, drawHeight);
-        ctx.drawImage(frameImage, 0, 0, ctx.canvas.width, ctx.canvas.height);
+        
+        const frameX = (size - frameImage.width) / 2;
+        const frameY = (size - frameImage.height) / 2;
+        ctx.drawImage(frameImage, frameX, frameY, frameImage.width, frameImage.height);
+        
         return compositionCanvas.toDataURL('image/png');
     }
 
