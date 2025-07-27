@@ -387,7 +387,10 @@
             const blob = await response.blob();
             const file = new File([blob], 'framed-photo.png', { type: blob.type });
             if (navigator.share && navigator.canShare({ files: [file] })) {
-                await navigator.share({ files: [file], title: 'My Framed Photo', text: 'Check out this photo I created!' });
+                // Removed title and text from the share data
+                await navigator.share({
+                    files: [file]
+                });
             } else {
                 alert(translations[currentLang].share_error);
             }
