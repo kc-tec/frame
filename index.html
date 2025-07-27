@@ -2,13 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Image Frame Generator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Koulen&family=Noto+Sans+Khmer:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', 'Noto Sans Khmer', sans-serif;
+            overscroll-behavior-y: contain;
+        }
+        .lang-btn.active {
+            background-color: #4f46e5; /* indigo-600 */
+            color: white;
         }
         .file-input-button {
             cursor: pointer;
@@ -21,334 +27,348 @@
         input[type="file"] {
             display: none;
         }
-        input[type="range"] {
-            -webkit-appearance: none;
-            appearance: none;
+        #live-preview-container {
+            touch-action: none;
+            cursor: grab;
+            background-color: #e5e7eb; /* gray-200 */
+        }
+        #live-preview-container:active {
+            cursor: grabbing;
+        }
+        #live-canvas, #frame-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            height: 8px;
-            background: #d1d5db; /* gray-300 */
-            border-radius: 9999px;
-            outline: none;
-            opacity: 0.7;
-            transition: opacity .2s;
+            height: 100%;
         }
-        input[type="range"]:hover {
-            opacity: 1;
-        }
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            background: #4f46e5; /* indigo-600 */
-            cursor: pointer;
-            border-radius: 50%;
-        }
-        input[type="range"]::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            background: #4f46e5; /* indigo-600 */
-            cursor: pointer;
-            border-radius: 50%;
+        #frame-overlay {
+            pointer-events: none;
         }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800 flex items-center justify-center min-h-screen p-4">
 
     <div class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-xl p-6 md:p-8">
+        <!-- Language Switcher -->
+        <div class="flex justify-center mb-6">
+            <div class="flex border border-gray-300 rounded-lg p-1">
+                <button id="lang-en" class="lang-btn px-4 py-1 text-sm font-semibold rounded-md transition-colors">English</button>
+                <button id="lang-km" class="lang-btn px-4 py-1 text-sm font-semibold rounded-md transition-colors" style="font-family: 'Koulen';">ខ្មែរ</button>
+            </div>
+        </div>
+
         <div class="text-center mb-8">
-            <h1 class="text-2xl md:text-3xl font-bold text-gray-900">Frame Your Photo</h1>
-            <p id="subtitle" class="text-gray-500 mt-2">Upload a frame and a photo to begin.</p>
+            <h1 data-translate="title" class="text-2xl md:text-3xl font-bold text-gray-900">Frame Your Photo</h1>
+            <p data-translate="subtitle_upload" id="subtitle" class="text-gray-500 mt-2">Upload a frame and a photo to begin.</p>
         </div>
 
         <!-- Upload Section -->
         <div id="upload-section">
-            <!-- Step 1: Upload Frame -->
             <div class="mb-6">
                 <label for="frame-upload" class="file-input-button flex items-center justify-center w-full bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md">
                     <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                    <span>1. Upload Frame Image</span>
+                    <span data-translate="upload_frame">1. Upload Frame Image</span>
                 </label>
                 <input id="frame-upload" type="file" accept="image/png, image/jpeg">
                 <p id="frame-filename" class="text-center text-sm text-gray-500 mt-2 truncate"></p>
             </div>
-
-            <!-- Step 2: Upload Photo -->
             <div class="mb-6">
                 <label for="photo-upload" class="file-input-button flex items-center justify-center w-full bg-sky-500 text-white font-semibold py-3 px-4 rounded-lg shadow-md">
                     <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                    <span>2. Upload Your Photo</span>
+                    <span data-translate="upload_photo">2. Upload Your Photo</span>
                 </label>
                 <input id="photo-upload" type="file" accept="image/png, image/jpeg">
                 <p id="photo-filename" class="text-center text-sm text-gray-500 mt-2 truncate"></p>
             </div>
         </div>
 
-        <!-- Hidden Canvas for Image Processing -->
-        <canvas id="canvas" class="hidden"></canvas>
+        <canvas id="composition-canvas" class="hidden"></canvas>
 
-        <!-- Result Section -->
         <div id="result-section" class="hidden text-center">
-            <!-- Result Display -->
-            <div class="relative w-full max-w-xs mx-auto bg-gray-200 rounded-lg overflow-hidden shadow-inner mb-6">
-                 <img id="result-image" src="" alt="Generated framed photo" class="w-full h-auto object-contain">
-                 <div id="loader" class="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center">
-                    <svg class="animate-spin h-8 w-8 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                </div>
+            <div id="live-preview-container" class="relative w-full max-w-xs mx-auto rounded-lg overflow-hidden shadow-inner mb-4">
+                 <canvas id="live-canvas"></canvas>
+                 <img id="frame-overlay" src="" alt="Frame overlay"/>
             </div>
+            <p data-translate="instructions" class="text-gray-500 text-sm mb-6 -mt-1">Drag to pan, pinch or scroll to zoom.</p>
 
-            <!-- Adjustment Controls -->
-            <div id="adjustment-controls" class="space-y-4 mb-6 p-4 bg-gray-50 rounded-lg">
-                 <!-- Scale -->
-                 <div>
-                    <label for="scale" class="block text-sm font-medium text-gray-600 mb-1">Zoom</label>
-                    <input type="range" id="scale" min="0.1" max="3" step="0.05" value="1">
-                 </div>
-                 <!-- Offset X -->
-                 <div>
-                    <label for="offsetX" class="block text-sm font-medium text-gray-600 mb-1">Horizontal</label>
-                    <input type="range" id="offsetX" min="-100" max="100" step="1" value="0">
-                 </div>
-                 <!-- Offset Y -->
-                 <div>
-                    <label for="offsetY" class="block text-sm font-medium text-gray-600 mb-1">Vertical</label>
-                    <input type="range" id="offsetY" min="-100" max="100" step="1" value="0">
-                 </div>
-                 <button id="reset-btn" class="w-full mt-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded-lg text-sm">Reset Adjustments</button>
-            </div>
-
-            <!-- Action Buttons -->
             <div id="action-buttons" class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <button id="back-btn" class="flex items-center justify-center w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 15l-3-3m0 0l3-3m-3 3h8M3 12a9 9 0 1118 0 9 9 0 01-18 0z"></path></svg>
-                    Change
+                    <span data-translate="button_change">Change</span>
                 </button>
                 <button id="download-btn" class="flex items-center justify-center w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                    Download
+                    <span data-translate="button_download">Download</span>
                 </button>
                 <button id="share-btn" class="flex items-center justify-center w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
                      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.368a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path></svg>
-                    Share
+                    <span data-translate="button_share">Share</span>
                 </button>
             </div>
         </div>
     </div>
 
 <script>
+    // --- Translations ---
+    const translations = {
+        en: {
+            title: "Frame Your Photo",
+            subtitle_upload: "Upload a frame and a photo to begin.",
+            subtitle_editor: "Adjust your photo, then save!",
+            upload_frame: "1. Upload Frame Image",
+            upload_photo: "2. Upload Your Photo",
+            instructions: "Drag to pan, pinch or scroll to zoom.",
+            button_change: "Change",
+            button_download: "Download",
+            button_share: "Share",
+            share_error: "Sharing is not supported on your browser. Please download the image and share it manually.",
+            share_generic_error: "Something went wrong while trying to share. Please try downloading instead."
+        },
+        km: {
+            title: "ដាក់ស៊ុមរូបថតរបស់អ្នក",
+            subtitle_upload: "បញ្ចូលស៊ុម និងរូបថតដើម្បីចាប់ផ្តើម។",
+            subtitle_editor: "ปรับរូបภาพของคุณ แล้วบันทึก!",
+            upload_frame: "១. បញ្ចូលរូបភាពស៊ុម",
+            upload_photo: "២. បញ្ចូលរូបថតរបស់អ្នក",
+            instructions: "អូសដើម្បីเลื่อน, หยิกหรือเลื่อนเพื่อซูม។",
+            button_change: "ផ្លាស់ប្តូរ",
+            button_download: "ទាញយក",
+            button_share: "ចែករំលែក",
+            share_error: "ការចែករំលែកមិនត្រូវបានគាំទ្រនៅលើកម្មវិធីរុករករបស់អ្នកទេ។ សូមទាញយករូបភាពហើយចែករំលែកវាដោយខ្លួនឯង។",
+            share_generic_error: "មានបញ្ហាខណៈពេលព្យាយាមចែករំលែក។ សូមព្យាយាមទាញយកแทน។"
+        }
+    };
+    let currentLang = 'en';
+
     // --- DOM Element References ---
+    const langEnBtn = document.getElementById('lang-en');
+    const langKmBtn = document.getElementById('lang-km');
     const uploadSection = document.getElementById('upload-section');
     const resultSection = document.getElementById('result-section');
     const subtitle = document.getElementById('subtitle');
-    
     const frameUpload = document.getElementById('frame-upload');
     const photoUpload = document.getElementById('photo-upload');
     const frameFilename = document.getElementById('frame-filename');
     const photoFilename = document.getElementById('photo-filename');
-    
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    
-    const resultImage = document.getElementById('result-image');
-    const loader = document.getElementById('loader');
-    const actionButtons = document.getElementById('action-buttons');
+    const livePreviewContainer = document.getElementById('live-preview-container');
+    const liveCanvas = document.getElementById('live-canvas');
+    const liveCtx = liveCanvas.getContext('2d');
+    const frameOverlay = document.getElementById('frame-overlay');
+    const compositionCanvas = document.getElementById('composition-canvas');
+    const compositionCtx = compositionCanvas.getContext('2d');
     const downloadBtn = document.getElementById('download-btn');
     const shareBtn = document.getElementById('share-btn');
     const backBtn = document.getElementById('back-btn');
-    
-    const adjustmentControls = document.getElementById('adjustment-controls');
-    const scaleSlider = document.getElementById('scale');
-    const offsetXSlider = document.getElementById('offsetX');
-    const offsetYSlider = document.getElementById('offsetY');
-    const resetBtn = document.getElementById('reset-btn');
 
-    // --- State Variables ---
-    let frameImage = null;
-    let userImage = null;
+    // --- State & Interaction Variables ---
+    let frameImage = null, userImage = null;
     let photoSettings = { scale: 1, offsetX: 0, offsetY: 0 };
+    let isDragging = false, startPos = { x: 0, y: 0 }, lastPan = { x: 0, y: 0 };
+    let initialPinchDistance = 0, lastScale = 1;
 
     // --- Event Listeners ---
+    langEnBtn.addEventListener('click', () => setLanguage('en'));
+    langKmBtn.addEventListener('click', () => setLanguage('km'));
     frameUpload.addEventListener('change', (e) => handleFileSelect(e, 'frame'));
     photoUpload.addEventListener('change', (e) => handleFileSelect(e, 'photo'));
     downloadBtn.addEventListener('click', downloadImage);
     shareBtn.addEventListener('click', shareImage);
     backBtn.addEventListener('click', resetToUpload);
-    scaleSlider.addEventListener('input', handleSliderChange);
-    offsetXSlider.addEventListener('input', handleSliderChange);
-    offsetYSlider.addEventListener('input', handleSliderChange);
-    resetBtn.addEventListener('click', resetAdjustments);
+    livePreviewContainer.addEventListener('mousedown', startDrag);
+    livePreviewContainer.addEventListener('touchstart', startDrag, { passive: false });
+    livePreviewContainer.addEventListener('mousemove', drag);
+    livePreviewContainer.addEventListener('touchmove', drag, { passive: false });
+    livePreviewContainer.addEventListener('mouseup', endDrag);
+    livePreviewContainer.addEventListener('touchend', endDrag);
+    livePreviewContainer.addEventListener('mouseleave', endDrag);
+    livePreviewContainer.addEventListener('wheel', handleWheel, { passive: false });
 
-    /**
-     * Resets the entire UI to the initial upload state.
-     */
+    // --- Language Function ---
+    function setLanguage(lang) {
+        currentLang = lang;
+        document.querySelectorAll('[data-translate]').forEach(el => {
+            const key = el.getAttribute('data-translate');
+            if (translations[lang][key]) {
+                el.textContent = translations[lang][key];
+            }
+        });
+        
+        // Update subtitle separately as its key changes
+        if(resultSection.classList.contains('hidden')) {
+            subtitle.textContent = translations[lang].subtitle_upload;
+        } else {
+            subtitle.textContent = translations[lang].subtitle_editor;
+        }
+
+        // Update active button style
+        langEnBtn.classList.toggle('active', lang === 'en');
+        langKmBtn.classList.toggle('active', lang === 'km');
+    }
+
+    // --- Core Functions ---
     function resetToUpload() {
-        // Reset state variables
-        frameImage = null;
-        userImage = null;
-        
-        // Clear file input values
-        frameUpload.value = '';
-        photoUpload.value = '';
-
-        // Clear filenames
-        frameFilename.textContent = '';
-        photoFilename.textContent = '';
-        
-        // Reset UI visibility
+        frameImage = null; userImage = null;
+        frameUpload.value = ''; photoUpload.value = '';
+        frameFilename.textContent = ''; photoFilename.textContent = '';
         uploadSection.classList.remove('hidden');
         resultSection.classList.add('hidden');
-        subtitle.textContent = 'Upload a frame and a photo to begin.';
-
-        // Reset adjustments
+        subtitle.textContent = translations[currentLang].subtitle_upload;
         resetAdjustments();
     }
 
-    /**
-     * Handles the file selection for both inputs.
-     * @param {Event} e The file input change event.
-     * @param {string} type The type of image being uploaded ('frame' or 'photo').
-     */
     function handleFileSelect(e, type) {
         const file = e.target.files[0];
         if (!file) return;
-
         const reader = new FileReader();
         reader.onload = (event) => {
             const img = new Image();
             img.onload = () => {
-                if (type === 'frame') {
-                    frameImage = img;
-                    frameFilename.textContent = file.name;
-                } else {
-                    userImage = img;
-                    photoFilename.textContent = file.name;
-                }
-                // Attempt to generate the image if both files are ready
-                if (frameImage && userImage) {
-                    switchToEditorView();
-                    generateFramedPhoto();
-                }
+                if (type === 'frame') frameImage = img;
+                else userImage = img;
+                
+                const filenameEl = type === 'frame' ? frameFilename : photoFilename;
+                filenameEl.textContent = file.name;
+
+                if (frameImage && userImage) switchToEditorView();
             };
             img.src = event.target.result;
         };
         reader.readAsDataURL(file);
     }
     
-    /**
-     * Switches the UI from upload view to the editor/result view.
-     */
     function switchToEditorView() {
         uploadSection.classList.add('hidden');
         resultSection.classList.remove('hidden');
-        subtitle.textContent = 'Adjust your photo and save!';
-    }
-
-    /**
-     * Updates settings from sliders and redraws the canvas.
-     */
-    function handleSliderChange() {
-        photoSettings.scale = parseFloat(scaleSlider.value);
-        photoSettings.offsetX = parseInt(offsetXSlider.value);
-        photoSettings.offsetY = parseInt(offsetYSlider.value);
-        generateFramedPhoto();
+        subtitle.textContent = translations[currentLang].subtitle_editor;
+        frameOverlay.src = frameImage.src;
+        livePreviewContainer.style.aspectRatio = frameImage.width / frameImage.height;
+        liveCanvas.width = frameImage.width;
+        liveCanvas.height = frameImage.height;
+        resetAdjustments();
+        drawLivePreview();
     }
     
-    /**
-     * Resets photo adjustments to their default values.
-     */
     function resetAdjustments() {
-        scaleSlider.value = 1;
-        offsetXSlider.value = 0;
-        offsetYSlider.value = 0;
-        if (frameImage && userImage) {
-             handleSliderChange();
-        }
+        photoSettings = { scale: 1, offsetX: 0, offsetY: 0 };
+        lastPan = { x: 0, y: 0 };
+        lastScale = 1;
     }
 
-    /**
-     * Draws the images on the canvas with adjustments.
-     */
-    function generateFramedPhoto() {
-        if (!frameImage || !userImage) return;
-        
-        loader.classList.remove('hidden');
-        resultImage.classList.add('hidden');
-
-        canvas.width = frameImage.width;
-        canvas.height = frameImage.height;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        ctx.save();
+    function drawLivePreview() {
+        if (!userImage || !liveCtx) return;
+        liveCtx.clearRect(0, 0, liveCanvas.width, liveCanvas.height);
+        liveCtx.save();
         const photoAspectRatio = userImage.width / userImage.height;
-        const canvasAspectRatio = canvas.width / canvas.height;
-        let drawWidth, drawHeight, x, y;
-
+        const canvasAspectRatio = liveCanvas.width / liveCanvas.height;
+        let drawWidth, drawHeight;
         if (photoAspectRatio > canvasAspectRatio) {
-            drawHeight = canvas.height;
+            drawHeight = liveCanvas.height;
             drawWidth = drawHeight * photoAspectRatio;
         } else {
-            drawWidth = canvas.width;
+            drawWidth = liveCanvas.width;
             drawHeight = drawWidth / photoAspectRatio;
         }
-        
         drawWidth *= photoSettings.scale;
         drawHeight *= photoSettings.scale;
-        
-        x = (canvas.width - drawWidth) / 2 + (photoSettings.offsetX * (canvas.width / 200));
-        y = (canvas.height - drawHeight) / 2 + (photoSettings.offsetY * (canvas.height / 200));
+        const x = (liveCanvas.width - drawWidth) / 2 + photoSettings.offsetX;
+        const y = (liveCanvas.height - drawHeight) / 2 + photoSettings.offsetY;
+        liveCtx.drawImage(userImage, x, y, drawWidth, drawHeight);
+        liveCtx.restore();
+    }
+    
+    // --- Interaction Handlers ---
+    function getEventPos(e) {
+        if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        return { x: e.clientX, y: e.clientY };
+    }
 
-        ctx.drawImage(userImage, x, y, drawWidth, drawHeight);
-        ctx.restore();
-
-        ctx.drawImage(frameImage, 0, 0, canvas.width, canvas.height);
-
-        const finalImageDataUrl = canvas.toDataURL('image/png');
-        
-        resultImage.src = finalImageDataUrl;
-        resultImage.onload = () => {
-            loader.classList.add('hidden');
-            resultImage.classList.remove('hidden');
+    function startDrag(e) {
+        e.preventDefault();
+        isDragging = true;
+        startPos = getEventPos(e);
+        lastPan = { x: photoSettings.offsetX, y: photoSettings.offsetY };
+        if (e.touches && e.touches.length === 2) {
+            initialPinchDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+            lastScale = photoSettings.scale;
         }
     }
 
-    /**
-     * Triggers the download of the generated image.
-     */
+    function drag(e) {
+        if (!isDragging) return;
+        e.preventDefault();
+        if (e.touches && e.touches.length === 2) {
+            const currentPinchDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+            photoSettings.scale = lastScale * (currentPinchDistance / initialPinchDistance);
+        } else if (!e.touches || e.touches.length === 1) {
+            const currentPos = getEventPos(e);
+            photoSettings.offsetX = lastPan.x + (currentPos.x - startPos.x);
+            photoSettings.offsetY = lastPan.y + (currentPos.y - startPos.y);
+        }
+        requestAnimationFrame(drawLivePreview);
+    }
+
+    function endDrag(e) { isDragging = false; }
+
+    function handleWheel(e) {
+        e.preventDefault();
+        const newScale = photoSettings.scale + (e.deltaY < 0 ? 1 : -1) * 0.1;
+        photoSettings.scale = Math.max(0.1, Math.min(newScale, 5));
+        requestAnimationFrame(drawLivePreview);
+    }
+
+    // --- Final Image Generation and Actions ---
+    function generateFinalImage() {
+        compositionCanvas.width = frameImage.width;
+        compositionCanvas.height = frameImage.height;
+        const ctx = compositionCtx;
+        const photoAspectRatio = userImage.width / userImage.height;
+        const canvasAspectRatio = ctx.canvas.width / ctx.canvas.height;
+        let drawWidth, drawHeight;
+        if (photoAspectRatio > canvasAspectRatio) {
+            drawHeight = ctx.canvas.height;
+            drawWidth = drawHeight * photoAspectRatio;
+        } else {
+            drawWidth = ctx.canvas.width;
+            drawHeight = drawWidth / photoAspectRatio;
+        }
+        drawWidth *= photoSettings.scale;
+        drawHeight *= photoSettings.scale;
+        const x = (ctx.canvas.width - drawWidth) / 2 + photoSettings.offsetX;
+        const y = (ctx.canvas.height - drawHeight) / 2 + photoSettings.offsetY;
+        ctx.drawImage(userImage, x, y, drawWidth, drawHeight);
+        ctx.drawImage(frameImage, 0, 0, ctx.canvas.width, ctx.canvas.height);
+        return compositionCanvas.toDataURL('image/png');
+    }
+
     function downloadImage() {
         const link = document.createElement('a');
-        link.href = resultImage.src;
+        link.href = generateFinalImage();
         link.download = 'framed-photo.png';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
     }
 
-    /**
-     * Shares the image using the Web Share API if available.
-     */
     async function shareImage() {
+        const finalImageURL = generateFinalImage();
         try {
-            const response = await fetch(resultImage.src);
+            const response = await fetch(finalImageURL);
             const blob = await response.blob();
             const file = new File([blob], 'framed-photo.png', { type: blob.type });
-
             if (navigator.share && navigator.canShare({ files: [file] })) {
-                await navigator.share({
-                    files: [file],
-                    title: 'My Framed Photo',
-                    text: 'Check out this photo I created!',
-                });
+                await navigator.share({ files: [file], title: 'My Framed Photo', text: 'Check out this photo I created!' });
             } else {
-                alert('Sharing is not supported on your browser. Please download the image and share it manually.');
+                alert(translations[currentLang].share_error);
             }
         } catch (error) {
             console.error('Error sharing:', error);
-            alert('Something went wrong while trying to share. Please try downloading instead.');
+            alert(translations[currentLang].share_generic_error);
         }
     }
+    
+    // Initialize with default language
+    setLanguage('en');
 </script>
 </body>
 </html>
